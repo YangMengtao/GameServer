@@ -1,11 +1,12 @@
+root = "$ROOT/"
 thread = 8
-cpath = "~/skynet/cservice/?.so"
+cpath = root .. "skynet/cservice/?.so"
 bootstrap = "snlua bootstrap"
 
 start = "main"
 harbor = 0
 
-lualoader = "~/skynet/lualib/loader.lua"
-luaservice = "./service/?.lua;" .. "./service/?/init.lua;" .. "~/skynet/servic/?.lua;"
-lua_path = "./etc/?.lua;" .. "./lualib/?.lua;" .. "~/skynet/lualib/?.lua;" .. "~/skynet/lualib/?/init.lua;"
-lua_cpath = "./luacpath/?.so;" .. "~/skynet/luaclib/?.so"
+lualoader =  root .. "skynet/lualib/loader.lua"
+luaservice = "./service/?.lua;" .. "./service/?/init.lua;" .. root .. "skynet/servic/?.lua;"
+lua_path = "./etc/?.lua;" .. "./lualib/?.lua;" .. root .. "skynet/lualib/?.lua;" .. root .. "skynet/lualib/?/init.lua;"
+lua_cpath = "./luacpath/?.so;" .. root .. "skynet/luaclib/?.so"
