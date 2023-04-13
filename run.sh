@@ -21,10 +21,14 @@ if ! dpkg-query -W -f='${Status}' gcc 2>/dev/null | grep -q "ok installed"; then
 fi
 gcc --version
 
-# 下载skynet源码
-echo "clone skynet ..."
-git clone http:://gitee.com/mirrors/skynet/git
+SKYNET_FILE=/skynet
+if ! [ -d "$SKYNET_FILE" ]; then
+    # 下载skynet源码
+    echo "clone skynet ..."
+    git clone http:://gitee.com/mirrors/skynet/git
+fi
 
+echo "show skynet example ..."
 cd skynet
 
 # 编译skynet
