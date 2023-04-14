@@ -52,6 +52,6 @@ SKYNET_FILE=~/skynet
 if ! [ -d "$SKYNET_FILE" ]; then
     # 下载skynet源码
     echo "clone skynet ..."
-    git clone http:://gitee.com/mirrors/skynet.git
+    git clone http://gitee.com/mirrors/skynet.git ../
     pause
 fi
