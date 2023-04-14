@@ -1,4 +1,5 @@
-root = "$HOME/"
+#root = "$HOME/"
+root = "./"
 thread = 8
 cpath = root .. "skynet/cservice/?.so"
 bootstrap = "snlua bootstrap"
