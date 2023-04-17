@@ -1,0 +1,31 @@
+# 查看
+ifconfig
+ifconfig -a
+
+# 防火墙状态
+firewall-cmd --state
+
+# 关闭防火墙
+systemctl stop firewalld
+
+# 开启防火墙
+systemctl start firewalld
+
+# 查看开放的端口
+sudo firewall-cmd --list-all
+
+# 打开端口
+sudo firewall-cmd --add-port=3306/tcp --permanent
+sudo firewall-cmd --reload
+
+# 关闭端口
+sudo firewall-cmd --remove-port=3306/tcp --permanent
+sudo firewall-cmd --reload
+
+# SSHD服务
+sudo apt-get install openssh-server
+
+# 启动
+/etc/init.d/ssh start
+
+ps -ef | grep sshd

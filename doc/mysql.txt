@@ -1,0 +1,72 @@
+
+# 安装
+sudo apt-get update
+
+sudo apt-get install mysql-server
+
+sudo mysql_secure_installation
+
+# 查看状态
+sudo service mysql status
+sudo systemctl status mysql.service
+
+# 启动/重启/关闭
+sudo service mysql start 
+sudo systemctl start mysql.service
+
+sudo service mysql restart
+sudo systemctl restart mysql.service
+
+sudo service mysql stop
+sudo systemctl stop mysql.service
+
+# 开启/关闭开机启动
+sudo service mysql enable/disable
+sudo systemctl enable/disable mysql.service
+
+# 远程连接
+sudo vim /etc/mysql/mysql.conf.d/mysqld.cnf
+找到bind-address = 127.0.0.1改为bind-address = 0.0.0.0
+
+# 首次进入mysql
+
+sudo cat /etc/mysql/debian.cnf
+
+mysql -udebanxxxx -p
+输入密码
+
+use mysql;
+select user,plugin from user;
+
+update user set plugin='mysql_native_password' where user='root';
+select user,plugin from user;
+
+flush privileges; # 更新权限
+
+alter user 'root'@'localhost' identified by '123456';
+
+flush privileges;
+
+update user set host='%' where user='root';
+grant all privileges on test.* to root@'%';
+GRANT ALL PRIVILEGES ON *.* TO 'root'@'%' WITH GRANT OPTION;
+
+flush privileges;
+
+sudo service mysql restart
+
+
+
+
+############################## test mysql ##############################
+
+CREATE DATABASE login_system;
+
+use login_system;
+
+CREATE TABLE user (
+    id INT NOT NULL AUTO_INCREMENT,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL,
+    PRIMARY KEY (id)
+);
