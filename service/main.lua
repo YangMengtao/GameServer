@@ -23,6 +23,14 @@ local function dump(res, tab)
     end
 end
 
+local isSuccess = function (res)
+    if res.badreult then
+        return true, res.errno, res.err
+    end
+
+    return false, nil, nil
+end
+
 skynet.start(function ()
     skynet.error("[Start Main] Server Start....")
 
@@ -45,11 +53,21 @@ skynet.start(function ()
         skynet.error("connect mysql success!")
     end
 
-    local res = db:query("insert into user(username,) values (\'aaaa\')")
-    dump(res)
+    local res = db:query("insert into user(username,password) values (\'aaaa\',\'123456\')")
+    local flag, code, msg = isSuccess(res)
+    if not flag then
+        skynet.error("QUERY FAILED = errcode = " .. code .. " msg = " .. msg)
+    else
+        dump(res)
+    end
 
     res = db:query('select * form user')
-    dump(res)
+    flag, code, msg = isSuccess(res)
+    if not flag then
+        skynet.error("QUERY FAILED = errcode = " .. code .. " msg = " .. msg)
+    else
+        dump(res)
+    end
 
     db:disconnect()
 
