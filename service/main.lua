@@ -25,10 +25,10 @@ end
 
 local isSuccess = function (res)
     if res.badreult then
-        return true, res.errno, res.err
+        return false, res.errno, res.err
     end
 
-    return false, nil, nil
+    return true, nil, nil
 end
 
 skynet.start(function ()
