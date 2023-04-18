@@ -19,6 +19,9 @@ function pause(){
         fi
 }
 
+# 安装cjson
+sudo apt-get install lua-cjson
+
 # 检查是否安装了mysql
 if ! dpkg-query -W -f='${Status}' mysql 2>/dev/null | grep -q "ok installed"; then
     echo "instatll mysql ..."
