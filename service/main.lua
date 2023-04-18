@@ -2,7 +2,7 @@
 local skynet = require "skynet"
 local mysql = require "skynet.db.mysql"
 local socket = require "skynet.socket"
-local json = require "json"
+--local json = require "cjson"
 
 local function convertToTab(res, tab, finalTable)
     if finalTable == nil then
@@ -44,14 +44,23 @@ local Query = function (db, sql)
     return tmp
 end
 
+local Decode = function (str, reps)
+    local resultStrList = {}
+    string.gsub(str, '[^' .. reps .. ']+', function (w)
+        table.insert(resultStrList, w)
+    end)
+    return resultStrList
+end
+
 local CMD = {}
 local Client_fd = {}
 local Online_User = {}
 
 function CMD.login(db, fd, msg)
-    local data = json.decode(msg)
-    local userName = data.username
-    local passWord = data.password
+    -- local data = json.decode(msg)
+    local data = Decode(msg, "|")
+    local userName = data[1]
+    local passWord = data[2]
 
     local check_username_sql = string.format("SELECT id FROM user WHERE username='%s'", userName)
     local check_password_sql = string.format("SELECT id FROM user WHERE password='%s'", passWord)
@@ -82,9 +91,9 @@ function CMD.login(db, fd, msg)
 end
 
 function CMD.send(fd, msg)
-    local data = json.decode(msg)
-    local to_user = data.to_user
-    local message = data.message
+    local data = Decode(msg, "|")
+    local to_user = data[1]
+    local message = data[2]
     local to = Online_User[to_user]
     if not to then
         return { code = 1, message = "对方不在线" }
@@ -145,13 +154,13 @@ skynet.start(function ()
                     break
                 end
 
-                local data = json.decode(str)
+                local data = Decode(str, "|")
                 local cmd = data.cmd
 
                 local func = CMD[cmd]
                 if func then
                     local res = func(fd, str)
-                    local res_str = json.encode(res)
+                    local res_str = res
                     socket.write(fd, res_str)
                 else
                     skynet.error("Unknown commond = ", cmd)
