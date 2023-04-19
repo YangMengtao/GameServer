@@ -64,7 +64,7 @@ skynet.start(function ()
     skynet.error("[Start Main] Server Start....")
 
     local gate = skynet.newservice("gate")
-    skynet.call(gate, "lua", "start")
+    -- skynet.call(gate, "lua", "start")
 
     -- socket.start(listen_id, function (fd, addr)
     --     skynet.error("Accept client socket:", fd, addr)
