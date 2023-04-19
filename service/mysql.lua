@@ -35,7 +35,8 @@ local IsSuccess = function (res)
 end
 
 local DataBase = {}
-DataBase.ConnectMySql = function ()
+
+function DataBase.ConnectMySql()
     DataBase.m_ConnectHandle = mysql.connect(
         {
             host = "127.0.0.1",
@@ -56,19 +57,34 @@ DataBase.ConnectMySql = function ()
     end
 end
 
-DataBase.DisconnectMySql = function ()
+function DataBase.DisconnectMySql()
     if DataBase.m_ConnectHandle then
         DataBase.m_ConnectHandle:disconnect()
+        DataBase.m_ConnectHandle = nil
     end
 end
 
-DataBase.Query = function (db, sql)
-    local res = db:query(sql)
-    local tmp = {}
-    ConvertToTab(res, 0, tmp)
-    return tmp
+function DataBase.Query(sql)
+    if DataBase.m_ConnectHandle then
+        local res = self.m_ConnectHandle:query(sql)
+        local tmp = {}
+        ConvertToTab(res, 0, tmp)
+    end
+    return nil
 end
 
+local function Init()
+    skynet.dispatch("lua", function (session, source, cmd, ...)
+        local func = DataBase[cmd]
+        if not func then
+            skynet.error("mysql not found function : " .. cmd)
+        end
+    end)
+end
+
+skynet.start(Init)
+
+return DataBase
 
 -- local res = Query(db, string.format("select id from user where username='%s'", "aaaa"))
 -- if #res > 0 then
