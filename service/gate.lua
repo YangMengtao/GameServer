@@ -17,6 +17,11 @@ local HandleConnection = function (fd, addr)
    while true do
         -- 接收客户端消息
         local msg, err = socket.read(fd)
+
+        -- 发送心跳包
+        skynet.sleep(500)
+        skynet.write("s2c -> heart")
+
         if err then
             skynet.error(string.format("Client %d closed: %s", fd, err))
             socket.close(fd)
