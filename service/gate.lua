@@ -3,6 +3,8 @@ local socket = require "skynet.socket"
 
 local HandleMessage = function (fd, msg)
     skynet.error("clinet fd = " .. fd .. " msg = " .. msg)
+
+    skynet.write(fd, "s2c = " .. msg)
 end
 
 local HandleConnection = function (fd, addr)
