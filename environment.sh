@@ -20,7 +20,7 @@ function pause(){
 }
 
 # 安装cjson
-sudo apt-get install lua-cjson
+# sudo apt-get install lua-cjson
 
 # 检查是否安装了mysql
 if ! dpkg-query -W -f='${Status}' mysql 2>/dev/null | grep -q "ok installed"; then
@@ -55,6 +55,6 @@ SKYNET_FILE=~/skynet
 if ! [ -d "$SKYNET_FILE" ]; then
     # 下载skynet源码
     echo "clone skynet ..."
-    git clone http://gitee.com/mirrors/skynet.git
+    git clone https://gitee.com/mirrors/skynet.git
     pause
 fi

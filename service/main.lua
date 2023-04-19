@@ -1,48 +1,6 @@
 
 local skynet = require "skynet"
-local mysql = require "skynet.db.mysql"
-local socket = require "skynet.socket"
 --local json = require "cjson"
-
-local function convertToTab(res, tab, finalTable)
-    if finalTable == nil then
-        return
-    end
-
-    tab = tab or 0
-    if tab == 0 then
-        skynet.error("---------------------- dump -------------------------")
-    end
-    if type(res) == "table" then
-        -- skynet.error(string.rep("\t", tab) .. "{")
-        for k, v in pairs(res) do
-            if type(v) == "table" then
-                convertToTab(v, tab + 1, finalTable)
-            else
-                -- skynet.error(string.rep("\t", tab), k, "=", v, ",")
-                finalTable[k] = v
-            end
-        end
-        -- skynet.error(string.rep("\t", tab) .. "}")
-    else
-        skynet.error(string.rep("\t", tab), res)
-    end
-end
-
-local isSuccess = function (res)
-    if res.badreult then
-        return false, res.errno, res.err
-    end
-
-    return true, nil, nil
-end
-
-local Query = function (db, sql)
-    local res = db:query(sql)
-    local tmp = {}
-    convertToTab(res, 0, tmp)
-    return tmp
-end
 
 local Decode = function (str, reps)
     local resultStrList = {}
@@ -98,87 +56,51 @@ function CMD.send(fd, msg)
     if not to then
         return { code = 1, message = "对方不在线" }
     end
-    socket.write(to, message)
+    -- socket.write(to, message)
     return { code = 0, message = "发送成功" }
 end
 
 skynet.start(function ()
     skynet.error("[Start Main] Server Start....")
 
-    local db = mysql.connect(
-        {
-            host = "127.0.0.1",
-            port = 3306,
-            database = "login_system",
-            user = "root",
-            password = "123456",
-            max_packet_size = 1024 * 1024,
-            on_connet = nil,
-        }
-    )
+    local gate = skynet.newservice("gate")
+    skynet.call(gate, "lua", "start")
 
-    if not db then
-        skynet.error("connect mysql failed!")
-        skynet.exit()
-    else
-        skynet.error("connect mysql success!")
-    end
+    -- socket.start(listen_id, function (fd, addr)
+    --     skynet.error("Accept client socket:", fd, addr)
 
-    local res = Query(db, string.format("select id from user where username='%s'", "aaaa"))
-    if #res > 0 then
-        res = Query(db, "select * form user")
-        local flag, code, msg = isSuccess(res)
-        if not flag then
-            skynet.error("QUERY FAILED = errcode = " .. code .. " msg = " .. msg)
-        end
-    else
-        res = Query(db, "insert into user(username,password) values (\'aaaa\',\'123456\')")
-        local flag, code, msg = isSuccess(res)
-        if not flag then
-            skynet.error("QUERY FAILED = errcode = " .. code .. " msg = " .. msg)
-        end
-    end
+    --     socket.start(fd)
+    --     Client_fd[fd] = nil
+    --     skynet.fork(function ()
+    --         while true do
+    --             local str = socket.readline(fd)
+    --             if not str then
+    --                 break
+    --             end
 
-    local listen_id = socket.listen("0.0.0.0", 3636)
-    skynet.error("Listen socket : ", "0.0.0.0", 3636)
+    --             local data = Decode(str, "|")
+    --             local cmd = data.cmd
 
-    socket.start(listen_id, function (fd, addr)
-        skynet.error("Accept client socket:", fd, addr)
+    --             local func = CMD[cmd]
+    --             if func then
+    --                 local res = func(fd, str)
+    --                 local res_str = res
+    --                 socket.write(fd, res_str)
+    --             else
+    --                 skynet.error("Unknown commond = ", cmd)
+    --             end
 
-        socket.start(fd)
-        Client_fd[fd] = nil
-        skynet.fork(function ()
-            while true do
-                local str = socket.readline(fd)
-                if not str then
-                    break
-                end
+    --             local userName = Client_fd[fd]
+    --             if userName then
+    --                 Online_User[userName] = nil
+    --                 Client_fd[fd] = nil
+    --             end
 
-                local data = Decode(str, "|")
-                local cmd = data.cmd
-
-                local func = CMD[cmd]
-                if func then
-                    local res = func(fd, str)
-                    local res_str = res
-                    socket.write(fd, res_str)
-                else
-                    skynet.error("Unknown commond = ", cmd)
-                end
-
-                local userName = Client_fd[fd]
-                if userName then
-                    Online_User[userName] = nil
-                    Client_fd[fd] = nil
-                end
-
-                skynet.error("Disconnect client socket = ", fd)
-                socket.closed(fd)
-            end
-        end)
-    end)
-
-    db:disconnect()
+    --             skynet.error("Disconnect client socket = ", fd)
+    --             socket.closed(fd)
+    --         end
+    --     end)
+    -- end)
 
     -- local worker = skynet.newservice("worker", 1, "worker")
     -- local buy = skynet.newservice("buy", 1, "buy")
