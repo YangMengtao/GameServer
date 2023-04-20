@@ -4,12 +4,12 @@ local redis = require "skynet.db.redis"
 local RedisPool = {}
 
 function RedisPool.connect()
-    local host = skynet.getenv("redis_conf.host")
-    local port = skynet.getenv("redis_conf.port")
+    -- local host = skynet.getenv("redis_conf.host")
+    -- local port = skynet.getenv("redis_conf.port")
 
     RedisPool.DB = redis.connect({
-        host = host,
-        port = port,
+        host = "127.0.0.1",
+        port = 6379,
         db = 0,
     })
 

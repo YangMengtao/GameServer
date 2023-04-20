@@ -4,22 +4,22 @@ local mysql = require "skynet.db.mysql"
 local MySqlPool = {}
 
 function MySqlPool.connect()
-    local host = skynet.getenv("mysql_conf.host")
-    local port = skynet.getenv("mysql_conf.port")
-    local database = skynet.getenv("mysql_conf.database")
-    local user = skynet.getenv("mysql_conf.user")
-    local password = skynet.getenv("mysql_conf.password")
-    local max_packet_size = skynet.getenv("mysql_conf.max_packet_size")
+    -- local host = skynet.getenv("mysql_conf.host")
+    -- local port = skynet.getenv("mysql_conf.port")
+    -- local database = skynet.getenv("mysql_conf.database")
+    -- local user = skynet.getenv("mysql_conf.user")
+    -- local password = skynet.getenv("mysql_conf.password")
+    -- local max_packet_size = skynet.getenv("mysql_conf.max_packet_size")
 
     
     MySqlPool.m_ConnectHandle = mysql.connect(
         {
-            host = host,
-            port = port,
-            database = database,
-            user = user,
-            password = password,
-            max_packet_size = max_packet_size,
+            host = "127.0.0.1",
+            port = 3306,
+            database = "login_system",
+            user = "root",
+            password = "123456",
+            max_packet_size = 1024 * 1024,
         }
     )
 

@@ -12,15 +12,3 @@ lua_path = "./etc/?.lua;" .. "./lualib/?.lua;" .. root .. "skynet/lualib/?.lua;"
 lua_cpath = "./luacpath/?.so;" .. root .. "skynet/luaclib/?.so;"
 
 login_addr = "127.0.0.1:3636"
-mysql_conf = {
-    host = "127.0.0.1",
-    port = 3306,
-    database = "login_system",
-    user = "root",
-    password = "123456",
-    max_packet_size = 1024 * 1024
-}
-redis_conf = {
-    host = "127.0.0.1",
-    port = 6379
-}
