@@ -38,7 +38,7 @@ skynet.start(function ()
                             tmp = tmp .. ", " .. k .. "=" .. v
                         end
                     end
-                    tmp = "}"
+                    tmp = tmp .. "}"
                     response(fd, wi.write, code, tmp)
                 end
             else
