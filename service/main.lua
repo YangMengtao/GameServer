@@ -9,9 +9,9 @@ skynet.start(function ()
     local agent = {}
     -- 创建20个服务处理不同客户端发来的消息
     for i = 1, 20 do
-        agent[i] = skynet.newservice(SERVICE_NAME, "agent", protocol)
+        agent[i] = skynet.newservice("agent")
     end
-
+    skynet.error(skynet.getenv("protocol"))
     local balance = 1
     local port = 3636
 	local id = socket.listen("0.0.0.0", port)
