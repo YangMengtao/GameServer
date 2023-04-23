@@ -4,7 +4,7 @@ local httpd = require "http.httpd"
 local sockethelper = require "http.sockethelper"
 local urllib = require "http.url"
 local webInterface = require "WebInterface"
-local cjson = require "cjson"
+--local cjson = require "cjson"
 
 local mode, protocol = ...
 protocol = protocol or "http"
@@ -82,10 +82,8 @@ local function init()
 			balance = 1
 		end
     end)
-
-    request()
 end
 
-skynet.start(function ()
-    init()
-end)
+skynet.start(request())
+
+skynet.start(init())
