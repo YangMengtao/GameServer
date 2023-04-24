@@ -1,0 +1,16 @@
+git clone https://github.com/mpx/lua-cjson
+
+make install
+
+# 报错缺少lua.h
+vim MakeFile
+# 添加
+CFLAGS += -I/home/sy/GameServer/skynet/3rd/lua
+
+# 查看lua.h的位置
+sudo find / -name "lua.h" 2>/dev/null
+
+# 查看cjson.so是否安装成功
+ls /usr/local/lib/lua/5.3/cjson.so
+
+# 将cjson.so拷贝到luacpath下面

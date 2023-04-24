@@ -4,8 +4,7 @@ local httpd = require "http.httpd"
 local sockethelper = require "http.sockethelper"
 local urllib = require "http.url"
 local webInterface = require "WebInterface"
-
-local protocol = "http"
+local cjson = require "cjson"
 
 local function response(id, write, ...)
 	local ok, err = httpd.write_response(write, ...)
@@ -17,6 +16,7 @@ end
 
 -- message callback
 skynet.start(function ()
+    local protocol = skynet.getenv("protocol") or "http"
     skynet.dispatch("lua", function (source, session, fd)
         socket.start(fd)
 
@@ -38,7 +38,8 @@ skynet.start(function ()
                             tmp = tmp .. ", " .. k .. "=" .. v
                         end
                     end
-                    tmp = tmp .. "}"
+                    tmp = tmp .. " }"
+                    tmp = cjson.encode(tmp)
                     response(fd, wi.write, code, tmp)
                 end
             else

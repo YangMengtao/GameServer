@@ -1,17 +1,14 @@
 local skynet = require "skynet"
 local socket = require "skynet.socket"
---local cjson = require "cjson"
-
-local protocol = "http"
 
 -- 初始化web socket
 skynet.start(function ()
     local agent = {}
+    local protocol = skynet.getenv("protocol") or "http"
     -- 创建20个服务处理不同客户端发来的消息
     for i = 1, 20 do
         agent[i] = skynet.newservice("agent")
     end
-    skynet.error(skynet.getenv("protocol"))
     local balance = 1
     local port = 3636
 	local id = socket.listen("0.0.0.0", port)
