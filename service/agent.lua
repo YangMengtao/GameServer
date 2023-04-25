@@ -5,6 +5,7 @@ local sockethelper = require "http.sockethelper"
 local urllib = require "http.url"
 local webInterface = require "WebInterface"
 local cjson = require "cjson"
+require "SystemMain"
 
 local function response(id, write, ...)
 	local ok, err = httpd.write_response(write, ...)
