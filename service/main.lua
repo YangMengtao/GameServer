@@ -12,10 +12,10 @@ skynet.start(function ()
     end
 
     -- 创建mysql服务
-    skynet.newservice("mysql_pool", "mysql_service")
+    local a = skynet.newservice("mysql_pool", "mysql_service")
 
     -- test
-    local _, res, _, _ = skynet.send("mysql_service", "lua", "excute", "SELECT id,password FROM user WHERE username='aaaa'")
+    local _, res, _, _ = skynet.send(a, "lua", "excute", "SELECT id,password FROM user WHERE username='aaaa'")
 
     -- 创建redis服务
     --GRedis = skynet.newservice("redis_pool")
