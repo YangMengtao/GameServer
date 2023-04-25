@@ -12,7 +12,7 @@ skynet.start(function ()
     end
 
     -- 创建mysql服务
-    GMySql = skynet.newservice("mysql_pool")
+    skynet.newservice("mysql_pool", "mysql_service")
 
     -- 创建redis服务
     --GRedis = skynet.newservice("redis_pool")

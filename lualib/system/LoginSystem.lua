@@ -25,7 +25,12 @@ function LoginSystem:login(data)
         ret.token = self.m_UserList[data.username]
         return ret
     end
-    local res, err, errno = skynet.send(GMySql, "excute", string.format(self.m_QueryPasswordSql, data.username))
+    local sql = string.format(self.m_QueryPasswordSql, data.username)
+    if GMySql == nil then
+        skynet.error("mysql service is null")
+    end
+    skynet.error(sql)
+    local res, err, errno = skynet.send("mysql_service", "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
     local ret = {}
     if res then
         if #res > 0 then
@@ -50,14 +55,14 @@ function LoginSystem:login(data)
 end
 
 function LoginSystem:register(data)
-    local res, err, errno = skynet.send(GMySql, "excute", string.format(self.m_QueryPasswordSql, data.username))
+    local res, err, errno = skynet.send("mysql_service", "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
     local ret = {}
     if res then
         if #res > 0 then
             ret.err = GErrCode.Login_AlreadyHasAccount
             return ret
         else
-            res, err, errno = skynet.send(GMySql, "excute", string.format(self.m_NewUserSql, data.username, data.password))
+            res, err, errno = skynet.send("mysql_service", "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
             if res then
                 ret.err = GErrCode.Common_Success
                 return ret
