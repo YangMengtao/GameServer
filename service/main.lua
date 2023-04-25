@@ -1,5 +1,6 @@
 local skynet = require "skynet"
 local socket = require "skynet.socket"
+require "SystemMain"
 
 -- 初始化web socket
 skynet.start(function ()
