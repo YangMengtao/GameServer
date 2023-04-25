@@ -9,6 +9,13 @@ skynet.start(function ()
     for i = 1, 20 do
         agent[i] = skynet.newservice("agent")
     end
+
+    -- 创建mysql服务
+    GMySql = skynet.newservice("mysql_pool")
+
+    -- 创建redis服务
+    GRedis = skynet.newservice("redis_pool")
+
     local balance = 1
     local port = 3636
 	local id = socket.listen("0.0.0.0", port)

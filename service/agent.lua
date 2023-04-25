@@ -31,16 +31,15 @@ skynet.start(function ()
                     response(fd, wi.write, code)
                 else
                     local path, query = urllib.parse(url)
-                    local tmp = "{ code = " .. code
                     if query then
+                        local cmd = string.sub(path, 2)
                         local q = urllib.parse_query(query)
-                        for k, v in pairs(q) do
-                            tmp = tmp .. ", " .. k .. "=" .. v
-                        end
+                        local args = cjson.decode(q["data"])
+                        local ret = GMgr:call(cmd, args)
+                        response(fd, wi.write, code, cjson.encode(ret))
+                    else
+                        response(fd, wi.write, code, "error")
                     end
-                    tmp = tmp .. " }"
-                    tmp = cjson.encode(tmp)
-                    response(fd, wi.write, code, tmp)
                 end
             else
                 if url == sockethelper.socket_error then

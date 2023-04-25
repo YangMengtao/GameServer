@@ -29,3 +29,5 @@ sudo apt-get install openssh-server
 /etc/init.d/ssh start
 
 ps -ef | grep sshd
+
+http://127.0.0.1:3636/login?data="{username='aaaa',password='123456'}"
