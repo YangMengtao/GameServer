@@ -10,6 +10,7 @@ end
 
 function M.excute(sql)
     if M.m_HandleID then
+        skynet.error(sql)
         local res, err = M.m_HandleID:query(sql)
         if not res then
             skynet.error("[Mysql Error] : mysql query error: " .. err)
