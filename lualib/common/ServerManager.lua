@@ -38,15 +38,4 @@ function ServerManager:getToken(uid)
     return token
 end
 
-function ServerManager:tableToString(tb)
-    local str = "{ "
-    for key, value in pairs(tb) do
-        str = str .. key .. "=" .. value .. ","
-    end
-    str = string.sub(str, 1, -2)
-    str = str .. " }"
-    skynet.error("[MGR] : tableToString = " .. str)
-    return str
-end
-
 return ServerManager

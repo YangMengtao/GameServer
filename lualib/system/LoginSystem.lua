@@ -23,7 +23,7 @@ function LoginSystem:login(data)
         local ret = {}
         ret.err = GErrCode.Common_Success
         ret.token = self.m_UserList[data.username]
-        return GMgr:tableToString(ret)
+        return ret
     end
     local res, err, errno = skynet.send(GMySql, "excute", string.format(self.m_QueryPasswordSql, data.username))
     local ret = {}
@@ -36,17 +36,17 @@ function LoginSystem:login(data)
                 self.m_UserList[data.username] = token
                 ret.err = GErrCode.Common_Success
                 ret.token = token
-                return GMgr:tableToString(ret)
+                return ret
             end
         else
             ret.err = GErrCode.Login_NotAccount
-            return GMgr:tableToString(ret)
+            return ret
         end
     end
 
     ret.err = GErrCode.Common_Unknown
     ret.msg = err
-    return GMgr:tableToString(ret)
+    return ret
 end
 
 function LoginSystem:register(data)
@@ -55,19 +55,19 @@ function LoginSystem:register(data)
     if res then
         if #res > 0 then
             ret.err = GErrCode.Login_AlreadyHasAccount
-            return GMgr:tableToString(ret)
+            return ret
         else
             res, err, errno = skynet.send(GMySql, "excute", string.format(self.m_NewUserSql, data.username, data.password))
             if res then
                 ret.err = GErrCode.Common_Success
-                return GMgr:tableToString(ret)
+                return ret
             end
         end
     end
 
     ret.err = GErrCode.Common_Unknown
     ret.msg = err
-    return GMgr:tableToString(ret)
+    return ret
 end
 
 return LoginSystem
