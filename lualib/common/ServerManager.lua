@@ -6,7 +6,7 @@ local ServerManager = Class:new()
 
 function ServerManager:ctor()
     self.m_Systems = {}
-    
+
     self:addSystem()
 end
 
@@ -14,16 +14,14 @@ function ServerManager:addSystem()
     self.m_Systems[GCmd:GetLoginCmd()] = require "system.LoginSystem"
 end
 
-function ServerManager:call(cmd, ...)
+function ServerManager:call(cmd, api, data)
     local system = self.m_Systems[cmd]
     if system ~= nil then
-        local args = {...}
-        local funcName = args[1]
-        local func = system[funcName]
+        local func = system[api]
         if func then
-            return func(system, ...)
+            return func(system, data)
         else
-            skynet.error("[System Error] : not found system = " .. cmd .. " function  = " .. funcName)
+            skynet.error("[System Error] : not found system = " .. cmd .. " function  = " .. api)
         end
     else
         skynet.error("[System Error] : not found system, system cmd = " .. cmd)

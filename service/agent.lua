@@ -35,8 +35,9 @@ skynet.start(function ()
                     if query then
                         local cmd = string.sub(path, 2)
                         local q = urllib.parse_query(query)
+                        local api = q["api"]
                         local args = cjson.decode(q["data"])
-                        local ret = GMgr:call(cmd, args)
+                        local ret = GMgr:call(cmd, api, args)
                         response(fd, wi.write, code, cjson.encode(ret))
                     else
                         response(fd, wi.write, code, "error")
