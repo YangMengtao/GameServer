@@ -2,7 +2,7 @@ local skynet = require "skynet"
 local Class = require "common.class"
 local md5 = require "md5"
 
-local login require "system.LoginSystem"
+local login = require "system.LoginSystem"
 
 local ServerManager = Class:new()
 
