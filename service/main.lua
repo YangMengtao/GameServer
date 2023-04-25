@@ -14,7 +14,7 @@ skynet.start(function ()
     GMySql = skynet.newservice("mysql_pool")
 
     -- 创建redis服务
-    GRedis = skynet.newservice("redis_pool")
+    --GRedis = skynet.newservice("redis_pool")
 
     local balance = 1
     local port = 3636
