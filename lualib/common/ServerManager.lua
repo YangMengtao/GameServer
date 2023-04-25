@@ -2,6 +2,8 @@ local skynet = require "skynet"
 local Class = require "common.class"
 local md5 = require "md5"
 
+local login require "system.LoginSystem"
+
 local ServerManager = Class:new()
 
 function ServerManager:ctor()
@@ -11,7 +13,7 @@ function ServerManager:ctor()
 end
 
 function ServerManager:addSystem()
-    self.m_Systems[GCmd:GetLoginCmd()] = require "system.LoginSystem"
+    self.m_Systems[GCmd:GetLoginCmd()] = login:new()
 end
 
 function ServerManager:call(cmd, api, data)
