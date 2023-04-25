@@ -6,6 +6,8 @@ local ServerManager = Class:new()
 
 function ServerManager:ctor()
     self.m_Systems = {}
+    
+    self:addSystem()
 end
 
 function ServerManager:addSystem()
