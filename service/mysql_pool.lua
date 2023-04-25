@@ -48,19 +48,22 @@ skynet.start(function ()
     end
 
     skynet.dispatch("lua", function (session, address, cmd, ...)
+        skynet.error("[Mysql] : cmd = " .. cmd)
         local func = M[cmd]
         if not func then
+            skynet.error("[Mysql Error] : not found function = " .. cmd)
             skynet.ret()
             return
         end
 
         local ret = table.pack(xpcall(func, TrackBack, address, ...))
         if not ret[1] then
+            skynet.error("[Mysql Error] : call function failed")
             skynet.ret();
             return
         end
 
-        skynet.retpack(table.unpack(ret, 2))
+        skynet.retpack(ret)
     end)
 
     skynet.error("[Mysql] : connect mysql success!")
