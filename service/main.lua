@@ -1,8 +1,5 @@
 local skynet = require "skynet"
 local socket = require "skynet.socket"
-local errcode = require "common.errcode"
-
-_G = errcode
 
 local M = {}
 M.m_ListenId = 0

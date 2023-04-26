@@ -1,10 +1,9 @@
 local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local Class = require "common.class"
+local errcode = require "LoginErrcode"
 
 local LoginSystem = Class:new()
-
-local errcode = _G.errcode
 
 function LoginSystem:ctor()
     self.m_MysqlDB = nil
@@ -49,19 +48,19 @@ function LoginSystem:login(data)
                 local token = self:getToken(uid)
                 self.m_UserList[token] = uid
                 ret.token = token
-                ret.errcode = errcode.Common.SUCCEESS
+                ret.errcode = errcode.SUCCEESS
                 return ret
             else
-                ret.errcode = errcode.Login.ERR_USER_OR_PASSWORD
+                ret.errcode = errcode.ERR_USER_OR_PASSWORD
                 return ret
             end
         else
-            ret.errcode = errcode.Login.ERR_NOT_FOUND_USER
+            ret.errcode = errcode.ERR_NOT_FOUND_USER
             return ret
         end
     end
 
-    ret.errcode = errcode.Common.UNKNOWN
+    ret.errcode = errcode.UNKNOWN
     return ret
 end
 
@@ -70,18 +69,18 @@ function LoginSystem:register(data)
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
     if result then
         if #result > 0 then
-            ret.errcode = errcode.Login.ERR_ALREADY_HAS_ACCOUNT
+            ret.errcode = errcode.ERR_ALREADY_HAS_ACCOUNT
             return ret
         else
             result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
             if result then
-                ret.errcode = errcode.Common.SUCCEESS
+                ret.errcode = errcode.SUCCEESS
                 return ret
             end
         end
     end
 
-    ret.errcode = errcode.Common.UNKNOWN
+    ret.errcode = errcode.UNKNOWN
     return ret
 end
 
