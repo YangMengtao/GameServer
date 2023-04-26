@@ -1,5 +1,5 @@
 local skynet = require "skynet"
-local login = require "system.LoginSystem"
+local login = require "system.login.LoginSystem"
 
 local login = login:new()
 

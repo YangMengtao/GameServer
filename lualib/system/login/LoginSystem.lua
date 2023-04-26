@@ -4,6 +4,8 @@ local Class = require "common.class"
 
 local LoginSystem = Class:new()
 
+local errcode = _G.errcode
+
 function LoginSystem:ctor()
     self.m_MysqlDB = nil
     self.m_RedisDB = nil
@@ -47,37 +49,44 @@ function LoginSystem:login(data)
                 local token = self:getToken(uid)
                 self.m_UserList[token] = uid
                 ret.token = token
-                ret.errcode = 0
+                ret.errcode = errcode.Common.SUCCEESS
+                return ret
+            else
+                ret.errcode = errcode.Login.ERR_USER_OR_PASSWORD
                 return ret
             end
         else
-            ret.errcode = 10001
+            ret.errcode = errcode.Login.ERR_NOT_FOUND_USER
             return ret
         end
     end
 
-    ret.errcode = -9999
+    ret.errcode = errcode.Common.UNKNOWN
     return ret
 end
 
 function LoginSystem:register(data)
+    local ret = {}
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
     if result then
         if #result > 0 then
-            return 10002
+            ret.errcode = errcode.Login.ERR_ALREADY_HAS_ACCOUNT
+            return ret
         else
             result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
             if result then
-                return 10003
+                ret.errcode = errcode.Common.SUCCEESS
+                return ret
             end
         end
     end
 
-    return -9999
+    ret.errcode = errcode.Common.UNKNOWN
+    return ret
 end
 
 function LoginSystem:getUserId(data)
-    return self.m_UserList[data.token]
+    return { self.m_UserList[data.token] }
 end
 
 return LoginSystem

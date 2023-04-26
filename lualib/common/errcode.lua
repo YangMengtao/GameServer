@@ -1,14 +1,13 @@
-local Class = require "common.class"
+local loginErr = require "system.login.LoginErrcode"
 
-local ErrCode = Class:new()
+local errcode = {}
 
-function ErrCode:ctro()
-    self.Common_Success = 0
-    self.Common_Unknown = -99999
-    
-    self.Login_AccountOrPassword = -10001
-    self.Login_NotAccount = -10002
-    self.Login_AlreadyHasAccount = -10003
-end
+errcode.Common =
+{
+    SUCCEESS = 0,
+    UNKNOWN = -1,
+}
 
-return ErrCode
+errcode.Login = loginErr
+
+return errcode

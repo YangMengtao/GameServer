@@ -46,7 +46,6 @@ skynet.start(function ()
     end
 
     skynet.dispatch("lua", function (session, address, cmd, ...)
-        skynet.error("[Mysql] : cmd = " .. cmd)
         local func = assert(M[cmd], string.format("[Mysql Error] : Unknown command %s", tostring(cmd)))
         skynet.ret(skynet.pack(func(...)))
     end)
