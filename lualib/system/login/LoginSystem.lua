@@ -43,7 +43,7 @@ function LoginSystem:login(data)
     local ret = {}
     if result then
         if #result > 0 then
-            local uid = result[1].id
+            local uid = result[1].uid
             local password = result[1].password
             if password == md5.sumhexa(tostring(data.password)) then
                 local token = self:getToken(uid)
