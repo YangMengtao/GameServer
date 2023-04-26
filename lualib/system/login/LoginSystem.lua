@@ -2,6 +2,7 @@ local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local Class = require "common.class"
 local errcode = require "system.login.LoginErrcode"
+local md5 = require "md5"
 
 local LoginSystem = Class:new()
 
@@ -43,7 +44,7 @@ function LoginSystem:login(data)
     if result then
         if #result > 0 then
             local uid = result[1].id
-            local password = result[1].password
+            local password = md5.sumhexa(result[1].password)
             if password == tostring(data.password) then
                 local token = self:getToken(uid)
                 self.m_UserList[token] = uid
@@ -72,7 +73,7 @@ function LoginSystem:register(data)
             ret.errcode = errcode.ERR_ALREADY_HAS_ACCOUNT
             return ret
         else
-            result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
+            result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, md5.sumhexa(data.password)))
             if result then
                 ret.errcode = errcode.SUCCEESS
                 return ret
