@@ -14,7 +14,7 @@ function LoginSystem:ctor()
 end
 
 function LoginSystem:initSql()
-    self.m_QueryPasswordSql = "SELECT id,password FROM user WHERE username='%s'"
+    self.m_QueryPasswordSql = "SELECT uid,password FROM user WHERE username='%s'"
     self.m_NewUserSql = "INSERT INTO user (username, password) VALUES ('%s', '%s')"
 end
 
