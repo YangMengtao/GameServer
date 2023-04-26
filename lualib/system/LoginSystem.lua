@@ -47,16 +47,16 @@ function LoginSystem:login(data)
                 local token = self:getToken(uid)
                 self.m_UserList[token] = uid
                 ret.token = token
-                ret.errcode = GErrCode.Common_Success
+                ret.errcode = 0
                 return ret
             end
         else
-            ret.errcode = GErrCode.Login_NotAccount
+            ret.errcode = 10001
             return ret
         end
     end
 
-    ret.errcode = GErrCode.Common_Unknown
+    ret.errcode = -9999
     return ret
 end
 
@@ -64,16 +64,16 @@ function LoginSystem:register(data)
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
     if result then
         if #result > 0 then
-            return GErrCode.Login_AlreadyHasAccount
+            return 10002
         else
             result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
             if result then
-                return GErrCode.Common_Success
+                return 10003
             end
         end
     end
 
-    return GErrCode.Common_Unknown
+    return -9999
 end
 
 function LoginSystem:getUserId(data)

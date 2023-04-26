@@ -14,18 +14,14 @@ function ServerManager:addSystem(name, service)
 end
 
 function ServerManager:call(cmd, api, data)
-    local system = self.m_Systems[cmd]
-    if system ~= nil then
-        local func = system[api]
-        if func then
-            return func(system, data)
-        else
-            skynet.error("[System Error] : not found system = " .. cmd .. " function  = " .. api)
-        end
+    local service = self.m_Systems[cmd]
+    if service ~= nil then
+        local ret = skynet.call(service, "lua", api, data)
+        return ret
     else
-        skynet.error("[System Error] : not found system, system cmd = " .. cmd)
+        skynet.error("[System Error] : not found service = " .. cmd)
     end
-    return "{ err = -9999}"
+    return { errcode = -6666}
 end
 
 return ServerManager
