@@ -1,7 +1,7 @@
 local skynet = require "skynet"
 local crypt = require "skynet.crypt"
 local Class = require "common.class"
-local errcode = require "LoginErrcode"
+local errcode = require "system.login.LoginErrcode"
 
 local LoginSystem = Class:new()
 
