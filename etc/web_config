@@ -11,6 +11,9 @@ luaservice = "./service/?.lua;" .. "./service/?/init.lua;" .. root .. "skynet/se
 lua_path = "./etc/?.lua;" .. "./lualib/?.lua;" .. root .. "skynet/lualib/?.lua;" .. root .. "skynet/lualib/?/init.lua;"
 lua_cpath = "./luacpath/?.so;" .. root .. "skynet/luaclib/?.so;"
 
+agnet_count = 10
+port = 3636
+
 -- web 服务协议
 protocol = "http"
 

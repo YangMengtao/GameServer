@@ -3,24 +3,18 @@ local mysql = require "skynet.db.mysql"
 
 local M = {}
 
-local function TrackBack(err)
-    skynet.error("[Mysql Error] : " .. tostring(err))
-    skynet.error("[Mysql Error] : " .. debug.traceback())
-end
-
 function M.excute(sql)
     if M.m_HandleID then
-        skynet.error(sql)
+        skynet.error("[Mysql EXCUTE] : " .. sql)
         local res, err = M.m_HandleID:query(sql)
         if not res then
             skynet.error("[Mysql Error] : mysql query error: " .. err)
-            return nil, err, 500
+            return nil
         end
-
-        return res, err, 0
+        return res
     end
-
-    return nil, nil, -1
+    skynet.error("[Mysql Error] : mysql not connected")
+    return nil
 end
 
 function M.disconnect()
@@ -31,6 +25,9 @@ function M.disconnect()
 end
 
 skynet.start(function ()
+    local function onConnect()
+        skynet.error("[Mysql] : connect mysql success!")
+    end
     M.m_HandleID = mysql.connect(
         {
             host = skynet.getenv("mysql_host"),
@@ -39,6 +36,7 @@ skynet.start(function ()
             user = skynet.getenv("mysql_user"),
             password = skynet.getenv("mysql_password"),
             max_packet_size = skynet.getenv("mysql_max_packet_size"),
+            on_connect = onConnect
         }
     )
 
@@ -49,22 +47,7 @@ skynet.start(function ()
 
     skynet.dispatch("lua", function (session, address, cmd, ...)
         skynet.error("[Mysql] : cmd = " .. cmd)
-        local func = M[cmd]
-        if not func then
-            skynet.error("[Mysql Error] : not found function = " .. cmd)
-            skynet.ret()
-            return
-        end
-
-        local ret = table.pack(xpcall(func, TrackBack, address, ...))
-        if not ret[1] then
-            skynet.error("[Mysql Error] : call function failed")
-            skynet.ret();
-            return
-        end
-
-        skynet.retpack(ret)
+        local func = assert(M[cmd], string.format("[Mysql Error] : Unknown command %s", tostring(cmd)))
+        skynet.ret(skynet.pack(func(...)))
     end)
-
-    skynet.error("[Mysql] : connect mysql success!")
 end)

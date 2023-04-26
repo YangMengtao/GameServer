@@ -1,11 +1,13 @@
 local skynet = require "skynet"
-local Class = require "common.EventDispatch"
+local crypt = require "skynet.crypt"
+local Class = require "common.class"
 
 local LoginSystem = Class:new()
 
 function LoginSystem:ctor()
+    self.m_MysqlDB = nil
+    self.m_RedisDB = nil
     self.m_UserList = {}
-
     self:initSql()
 end
 
@@ -14,61 +16,68 @@ function LoginSystem:initSql()
     self.m_NewUserSql = "INSERT INTO user (username, password) VALUES ('%s', '%s')"
 end
 
+function LoginSystem:initDB(mysql_db, redis_db)
+    self.m_MysqlDB = mysql_db
+    self.m_RedisDB = redis_db
+end
+
+function LoginSystem:getToken(uid)
+    math.randomseed(tostring(os.time()):reverse():sub(1, 7) .. tostring(uid))
+    local token = ""
+    for i = 1, 32 do
+        token = token .. string.char(math.random(97, 122))
+    end
+    return token
+end
+
 --[[
+    data.token
     data.username
     data.password
 ]]
 function LoginSystem:login(data)
-    if self.m_UserList[data.username] then
-        local ret = {}
-        ret.err = GErrCode.Common_Success
-        ret.token = self.m_UserList[data.username]
-        return ret
-    end
     local sql = string.format(self.m_QueryPasswordSql, data.username)
-    local _, res, err, errno = skynet.send("mysql_service", "lua", "excute", sql)
+    local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
     local ret = {}
-    if res then
-        if #res > 0 then
-            local uid = res[1].id
-            local password = res[2].password
+    if result then
+        if #result > 0 then
+            local uid = result[1].id
+            local password = result[1].password
             if password == tostring(data.password) then
-                local token = GMgr:getToken(uid)
-                self.m_UserList[data.username] = token
-                ret.err = GErrCode.Common_Success
+                local token = self:getToken(uid)
+                self.m_UserList[token] = uid
                 ret.token = token
+                ret.errcode = GErrCode.Common_Success
                 return ret
             end
         else
-            ret.err = GErrCode.Login_NotAccount
+            ret.errcode = GErrCode.Login_NotAccount
             return ret
         end
     end
 
-    ret.err = GErrCode.Common_Unknown
-    ret.msg = err
+    ret.errcode = GErrCode.Common_Unknown
     return ret
 end
 
 function LoginSystem:register(data)
-    local _, res, err, errno = skynet.send("mysql_service", "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
-    local ret = {}
-    if res then
-        if #res > 0 then
-            ret.err = GErrCode.Login_AlreadyHasAccount
-            return ret
+    local result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_QueryPasswordSql, data.username))
+    if result then
+        if #result > 0 then
+            return GErrCode.Login_AlreadyHasAccount
         else
-            _, res, err, errno = skynet.send("mysql_service", "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
-            if res then
-                ret.err = GErrCode.Common_Success
-                return ret
+            result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, data.password))
+            if result then
+                return GErrCode.Common_Success
             end
         end
     end
 
-    ret.err = GErrCode.Common_Unknown
-    ret.msg = err
-    return ret
+    return GErrCode.Common_Unknown
+end
+
+function LoginSystem:getUserId(data)
+    return self.m_UserList[data.token]
 end
 
 return LoginSystem
