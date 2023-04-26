@@ -20,7 +20,7 @@ protocol = "http"
 -- MySql 配置
 mysql_host = "127.0.0.1"
 mysql_port = 3306
-mysql_database = "login_system"
+mysql_database = "GameDB"
 mysql_user = "root"
 mysql_password = "123456"
 mysql_max_packet_size = 1024 * 1024
