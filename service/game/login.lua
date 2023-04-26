@@ -21,6 +21,4 @@ skynet.start(function ()
 
         skynet.ret(skynet.pack(func(login, ...)))
     end)
-
-    skynet.exit()
 end)

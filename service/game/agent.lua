@@ -64,6 +64,4 @@ skynet.start(function ()
             end
         end
     end)
-
-    skynet.exit()
 end)
