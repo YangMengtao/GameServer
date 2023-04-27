@@ -13,8 +13,8 @@ end
 
 function system:getUid(token)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
-    online_users = cjson.decode(online_users)
     if online_users then
+        online_users = cjson.decode(online_users)
         return online_users[token]
     end
     return nil
@@ -22,8 +22,8 @@ end
 
 function system:getToken(uid)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
-    online_users = cjson.decode(online_users)
     if online_users then
+        online_users = cjson.decode(online_users)
         for token, v in pairs(online_users) do
             if tonumber(v) == tonumber(uid) then
                 return token
@@ -36,8 +36,13 @@ end
 function system:setToOnline(uid, token)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses") or {}
     if online_users and online_users[token] == nil then
+        if type(online_users) == "string" then
+            online_users = cjson.decode(online_users)
+        end
         online_users[token] = uid
-        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", cjson.encode(online_users))
+        local value = cjson.encode(online_users)
+        skynet.error(string.format("[Logic Error] : current online user info = %s", value))
+        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", value)
         skynet.call(self.m_RedisDB, "lua", "set", token, uid)
         return errcode.SUCCEESS
     else
@@ -55,10 +60,12 @@ function system:checkToken(data)
 
     -- 更新在线玩家
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
-    online_users = cjson.decode(online_users)
     if online_users then
+        online_users = cjson.decode(online_users)
         online_users[data.token] = nil
-        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", cjson.encode(online_users))
+        local value = cjson.encode(online_users)
+        skynet.error(string.format("[Logic Error] : current online user info = %s", value))
+        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", value)
     end
 
     return uid, errcode.INVALID_TOKEND
