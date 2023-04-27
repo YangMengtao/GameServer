@@ -31,7 +31,7 @@ function system:getToken(uid)
 end
 
 function system:setToOnline(uid, token)
-    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses") or {}
     if online_users and online_users[token] ~= nil then
         online_users[token] = uid
         skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", online_users)
