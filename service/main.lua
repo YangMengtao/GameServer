@@ -25,7 +25,6 @@ skynet.start(function ()
 
     -- 创建mysql服务
     local mysql_db = skynet.newservice("mysql_pool")
-
     -- test
     -- skynet.send("Mysql_Pool", "lua", "excute", "SELECT id,password FROM user WHERE username='aaaa'", function (...)
     --     local args = { ... }
@@ -35,9 +34,15 @@ skynet.start(function ()
     -- end)
 
     -- 创建redis服务
-    --GRedis = skynet.newservice("redis_pool")
+    local redis_db = skynet.newservice("redis_pool")
+    -- test redis
+    -- skynet.send(redis_db, "lua", "set", "testa", 123455)
+    -- local ret = skynet.call(redis_db, "lua", "get", "testa")
+    -- if ret then
+    --     skynet.error("redis : v = " .. ret)
+    -- end
 
-    local login = skynet.newservice("login", mysql_db)
+    local login = skynet.newservice("login", mysql_db, redis_db)
     for _, value in ipairs(M.m_Agent) do
         skynet.send(value, "lua", "ADD_SYSTEM", "login", login)
     end

@@ -3,15 +3,6 @@ local redis = require "skynet.db.redis"
 
 local M = {}
 
-function M.excute(cmd, ...)
-    local res, err = M.m_HandleID[cmd](M.m_HandleID, ...)
-    if not res then
-        skynet.error("[Redis Error] : redis exec error: " .. err)
-        return nil, err
-    end
-    return res, err
-end
-
 function M.disconnect()
     if M.m_HandleID then
         M.m_HandleID:disconnect()
@@ -29,6 +20,11 @@ skynet.start(function ()
         skynet.error("[Redis Error] : failed to connect to redis server")
         return false
     end
+
+    skynet.dispatch("lua", function (session, address, cmd, ...)
+        local func = assert(M.m_HandleID[cmd], string.format("[Mysql Error] : Unknown command %s", tostring(cmd)))
+        skynet.ret(skynet.pack(func(M.m_HandleID, ...)))
+    end)
 
     skynet.error("[Redis] : connect to redis server success!")
     return true

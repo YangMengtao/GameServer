@@ -1,0 +1,50 @@
+# 安装
+sudo apt install redis-server
+
+# 查看运行状态
+sudo systemctl status redis-server
+
+# 正在运行
+● redis-server.service - Redis Server
+   Loaded: loaded (/lib/systemd/system/redis-server.service; enabled; vendor preset: enabled)
+   Active: active (running) since Wed 2023-04-28 09:46:47 UTC; 5s ago
+ Main PID: 12345 (redis-server)
+    Tasks: 4 (limit: 2232)
+   Memory: 1.1M
+   CGroup: /system.slice/redis-server.service
+           └─12345 /usr/bin/redis-server 127.0.0.1:6379
+
+# 启动redis server
+sudo systemctl start redis-server
+
+
+# API
+skynet.call(self.m_RedisDB, "lua", "get", key)：获取指定键的值。
+skynet.call(self.m_RedisDB, "lua", "set", key, value)：将指定的值设置为键的值。
+skynet.call(self.m_RedisDB, "lua", "setex", key, expire_seconds, value)：将指定的值设置为键的值，并设置过期时间（单位为秒）。
+skynet.call(self.m_RedisDB, "lua", "del", key)：删除指定键的值。
+skynet.call(self.m_RedisDB, "lua", "exists", key)：判断指定的键是否存在。
+skynet.call(self.m_RedisDB, "lua", "expire", key, expire_seconds)：设置指定键的过期时间（单位为秒）。
+skynet.call(self.m_RedisDB, "lua", "incrby", key, increment)：将指定键的值增加指定的增量。
+skynet.call(self.m_RedisDB, "lua", "decrby", key, decrement)：将指定键的值减少指定的减量。
+skynet.call(self.m_RedisDB, "lua", "hmset", key, field1, value1, field2, value2, ...)：为指定的哈希表设置指定字段的值。
+skynet.call(self.m_RedisDB, "lua", "hmget", key, field1, field2, ...)：获取指定哈希表的指定字段的值。
+skynet.call(self.m_RedisDB, "lua", "hgetall", key)：获取指定哈希表的所有字段和值。
+skynet.call(self.m_RedisDB, "lua", "hkeys", key)：获取指定哈希表的所有字段。
+skynet.call(self.m_RedisDB, "lua", "hvals", key)：获取指定哈希表的所有值。
+skynet.call(self.m_RedisDB, "lua", "lpush", key, value1, value2, ...)：将指定值从列表左侧插入列表。
+skynet.call(self.m_RedisDB, "lua", "rpush", key, value1, value2, ...)：将指定值从列表右侧插入列表。
+skynet.call(self.m_RedisDB, "lua", "lrange", key, start_index, end_index)：获取指定列表的指定范围的元素。
+skynet.call(self.m_RedisDB, "lua", "llen", key)：获取指定列表的长度。
+skynet.call(self.m_RedisDB, "lua", "sadd", key, member1, member2, ...)：将指定成员添加到指定集合中。
+skynet.call(self.m_RedisDB, "lua", "smembers", key)：获取指定集合中的所有成员。
+skynet.call(self.m_RedisDB, "lua", "sismember", key, member)：判断指定成员是否存在于指定集合中。
+skynet.call(self.m_RedisDB, "lua", "scard", key)：获取指定集合的成员数。
+skynet.call(self.m_RedisDB, "lua", "spop", key)：从指定集合中随机移除并返回一个成员。
+
+
+
+
+
+
+Regenerate response

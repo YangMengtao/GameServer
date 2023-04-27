@@ -5,6 +5,10 @@ CREATE DATABASE GameDB;
 --DESCRIBE `user`; 
 --SHOW COLUMNS FROM `user`;
 
+-- uid 账号唯一id
+-- usename 账号名字
+-- password 账号密码
+-- permission 权限
 CREATE TABLE `user` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(128) NOT NULL,
@@ -16,6 +20,7 @@ CREATE TABLE `user` (
 --INSERT INTO `user` (`username`, `password`) VALUES ('a1234', "123456");
 --SELECT uid, username, password, permission FROM user;
 -- DELETE FROM user WHERE gold = 0;
+
 
 CREATE TABLE 'player' (
   'id' INT(11) NOT NULL AUTO_INCREMENT,

@@ -1,15 +1,13 @@
+local system = require "common.system"
+
 local skynet = require "skynet"
 local crypt = require "skynet.crypt"
-local Class = require "common.class"
 local errcode = require "system.login.LoginErrcode"
 local md5 = require "md5"
 
-local LoginSystem = Class:new()
+local LoginSystem = system:new()
 
 function LoginSystem:ctor()
-    self.m_MysqlDB = nil
-    self.m_RedisDB = nil
-    self.m_UserList = {}
     self:initSql()
 end
 
@@ -18,12 +16,7 @@ function LoginSystem:initSql()
     self.m_NewUserSql = "INSERT INTO user (username, password) VALUES ('%s', '%s')"
 end
 
-function LoginSystem:initDB(mysql_db, redis_db)
-    self.m_MysqlDB = mysql_db
-    self.m_RedisDB = redis_db
-end
-
-function LoginSystem:getToken(uid)
+function LoginSystem:genToken(uid)
     math.randomseed(tostring(os.time()):reverse():sub(1, 7) .. tostring(uid))
     local token = ""
     for i = 1, 32 do
@@ -47,7 +40,13 @@ function LoginSystem:login(data)
             local password = result[1].password
             if password == md5.sumhexa(tostring(data.password)) then
                 local token = self:getToken(uid)
-                self.m_UserList[token] = uid
+                if token then
+                    ret.errcode = errcode.ERR_REPEAT_LOGIN
+                    ret.token = token
+                    return ret
+                end
+                token = self:genToken(uid)
+                self:setToOnline(uid, token)
                 ret.token = token
                 ret.errcode = errcode.SUCCEESS
                 return ret
@@ -75,6 +74,12 @@ function LoginSystem:register(data)
         else
             result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, md5.sumhexa(data.password)))
             if result then
+                local sql = string.format(self.m_QueryPasswordSql, data.username)
+                local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+                local uid = result[1].uid
+                local token = self:genToken(uid)
+                self:setToOnline(uid, token)
+                ret.token = token
                 ret.errcode = errcode.SUCCEESS
                 return ret
             end
@@ -83,10 +88,6 @@ function LoginSystem:register(data)
 
     ret.errcode = errcode.UNKNOWN
     return ret
-end
-
-function LoginSystem:getUserId(data)
-    return { self.m_UserList[data.token] }
 end
 
 return LoginSystem
