@@ -39,7 +39,7 @@ function system:setToOnline(uid, token)
         return errcode.SUCCEESS
     else
         skynet.error(string.format("[Logic Error] : user uid = %s alredy exists, token is %s", uid, token))
-        return errcode.UNKNOWN
+        return errcode.UNKNOWN, online_users[token]
     end
 end
 

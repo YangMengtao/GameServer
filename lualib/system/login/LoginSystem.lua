@@ -46,7 +46,10 @@ function LoginSystem:login(data)
                     return ret
                 end
                 token = self:genToken(uid)
-                self:setToOnline(uid, token)
+                local eno, t = self:setToOnline(uid, token)
+                if errcode.SUCCEESS ~= eno then
+                    token = t
+                end
                 ret.token = token
                 ret.errcode = errcode.SUCCEESS
                 return ret
