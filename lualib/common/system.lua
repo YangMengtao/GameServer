@@ -2,6 +2,7 @@ local Class = require "common.class"
 local errcode = require "common.errcode"
 
 local skynet = require "skynet"
+local cjson = require "cjson"
 
 local system = Class:new()
 
@@ -12,6 +13,7 @@ end
 
 function system:getUid(token)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    online_users = cjson.decode(online_users)
     if online_users then
         return online_users[token]
     end
@@ -20,9 +22,10 @@ end
 
 function system:getToken(uid)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    online_users = cjson.decode(online_users)
     if online_users then
         for token, v in pairs(online_users) do
-            if v == uid then
+            if tonumber(v) == tonumber(uid) then
                 return token
             end
         end
@@ -34,7 +37,7 @@ function system:setToOnline(uid, token)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses") or {}
     if online_users and online_users[token] == nil then
         online_users[token] = uid
-        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", online_users)
+        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", cjson.encode(online_users))
         skynet.call(self.m_RedisDB, "lua", "set", token, uid)
         return errcode.SUCCEESS
     else
@@ -52,9 +55,10 @@ function system:checkToken(data)
 
     -- 更新在线玩家
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    online_users = cjson.decode(online_users)
     if online_users then
         online_users[data.token] = nil
-        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", online_users)
+        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", cjson.encode(online_users))
     end
 
     return uid, errcode.INVALID_TOKEND
