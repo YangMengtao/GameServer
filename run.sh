@@ -26,7 +26,7 @@ fi
 # 参数=w 则启动web服务器
 case "${1,,}" in
   w)
-    ./skynet/skynet etc/web_config
+    nohup ./skynet/skynet etc/web_config  >logs/skynet.log 2>&1
     ;;
   *)
     ./skynet/skynet etc/config
