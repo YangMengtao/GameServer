@@ -60,9 +60,9 @@ sudo service mysql restart
 
 ############################## test mysql ##############################
 
-CREATE DATABASE login_system;
+CREATE DATABASE GameDB;
 
-use login_system;
+use GameDB;
 
 CREATE TABLE user (
     id INT NOT NULL AUTO_INCREMENT,
