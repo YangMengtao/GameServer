@@ -57,14 +57,14 @@ function PlayerSystem:getPlayer(data)
     local uid = self:getUid(data.token)
     local info = self:findPlayerInRedis(uid)
     if info then
-        return true, info
+        return info
     end
 
     local ret = self:createPlayer(uid, data.nickname)
     if errcode.SUCCEESS ~= ret then
-        return false, ret
+        return ret
     end
-    return true, self:findPlayerInRedis(uid)
+    return self:findPlayerInRedis(uid)
 end
 
 function PlayerSystem:getPlayerByUid(uid, nickname)
