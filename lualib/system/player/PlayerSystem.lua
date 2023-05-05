@@ -188,7 +188,12 @@ function PlayerSystem:findPlayerInRedis(uid)
         skynet.error("[PLAYER] find player in redis players = " .. players)
         players = cjson.decode(players)
     end
-    return players[uid]
+    for _, info in ipairs(players) do
+        if tonumber(info.uid) == tonumber(uid) then
+            return info
+        end
+    end
+    return nil
 end
 
 function PlayerSystem:setPlayerInRedis(info)
@@ -196,7 +201,7 @@ function PlayerSystem:setPlayerInRedis(info)
     if type(players) == "string" then
         players = cjson.decode(players)
     end
-    players[info.id] = info
+    table.insert(players, info)
     local str = cjson.encode(players)
     skynet.error("[PLAYER]set player in redis data = " .. str)
     skynet.call(self.m_RedisDB, "lua", "set", "PlayerInfo", str)
