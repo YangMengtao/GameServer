@@ -169,6 +169,7 @@ function PlayerSystem:updateLevel(pid, value)
 function PlayerSystem:findPlayerInRedis(uid)
     local players = skynet.call(self.m_RedisDB, "lua", "get", "PlayerInfo") or {}
     if type(players) == "string" then
+        skynet.error("[PLAYER] find player in redis players = " .. players)
         players = cjson.decode(players)
     end
     return players[uid]
@@ -181,6 +182,7 @@ function PlayerSystem:setPlayerInRedis(info)
     end
     players[info.id] = info
     local str = cjson.encode(players)
+    skynet.error("[PLAYER]set player in redis data = " .. str)
     skynet.call(self.m_RedisDB, "lua", "set", "PlayerInfo", str)
 end
 
