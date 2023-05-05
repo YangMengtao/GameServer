@@ -59,7 +59,16 @@ function PlayerSystem:getPlayer(data)
     if info then
         return info
     end
-
+    local p = self:getPlayerByUid(uid)
+    if p ~= nil then
+        if p.team == nil then
+            p.errcode = errcode.ERR_NO_MEMBER
+            return p
+        else
+            self:setPlayerInRedis(p)
+            return self:findPlayerInRedis(uid)
+        end
+    end
     local ret = self:createPlayer(uid, data.nickname)
     if errcode.SUCCEESS ~= ret then
         return ret
@@ -67,17 +76,24 @@ function PlayerSystem:getPlayer(data)
     return self:findPlayerInRedis(uid)
 end
 
-function PlayerSystem:getPlayerByUid(uid, nickname)
-    local info = self:findPlayerInRedis(uid)
-    if info then
-        return true, info
+function PlayerSystem:getPlayerByUid(uid)
+    -- 查询player数据
+    local sql = string.format(self.m_QueryByUidSql, uid)
+    local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+    if result then
+        local ret = {}
+        ret.id = result[1].id
+        ret.uid = result[1].uid
+        ret.nickname = result[1].nickname
+        ret.money = result[1].money
+        ret.curlevel = result[1].curlevel
+        ret.item = result[1].item
+        ret.token = self:getToken(ret.uid)
+        ret.team = self:queryMember(ret.id)
+        return ret;
     end
 
-    local ret = self:createPlayer(uid, nickname)
-    if errcode.SUCCEESS ~= ret then
-        return false, ret
-    end
-    return true, self:findPlayerInRedis(uid)
+    return nil
 end
 
 function PlayerSystem:addNewMember(pid, hp, energy)
