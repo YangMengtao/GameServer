@@ -53,14 +53,14 @@ function PlayerSystem:createPlayer(uid, nickname)
     return errcode.ERR_ADD_NEW_PLAYER_FAILED
 end
 
-function PlayerSystem:getPlayerByToken(token, nickname)
-    local uid = self:getUid(token)
+function PlayerSystem:getPlayer(data)
+    local uid = self:getUid(data.token)
     local info = self:findPlayerInRedis(uid)
     if info then
         return true, info
     end
 
-    local ret = self:createPlayer(uid, nickname)
+    local ret = self:createPlayer(uid, data.nickname)
     if errcode.SUCCEESS ~= ret then
         return false, ret
     end
