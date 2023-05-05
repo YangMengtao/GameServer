@@ -11,7 +11,7 @@ function PlayerSystem:ctor()
 end
 
 function PlayerSystem:initSql()
-    self.m_QueryByUidSql = "SELECT id,uid,nickname,money,curlevel,item,team FROM player WHERE uid='%d'"
+    self.m_QueryByUidSql = "SELECT id,uid,nickname,money,curlevel,item FROM player WHERE uid='%d'"
     self.m_NewPlayerSql = "INSERT INTO player (uid,nickname) VALUES ('%d', '%s')"
     self.m_UpatePlayerSql = "UPDATE player SET nickname = %s,SET money = %d,SET curlevel = %d,SET item = %s WHERE uid = '%d'"
     self.m_NewMemberSql = "INSERT INTO team_member (pid,hp,energy) VALUES ('%d', '%d', '%d')"
