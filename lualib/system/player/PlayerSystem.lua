@@ -23,7 +23,7 @@ function PlayerSystem:createPlayer(uid, nickname)
     -- 添加Player
     local sql = string.format(self.m_NewPlayerSql, uid, nickname)
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
-    if result and #result > 0 then
+    if result then
         -- 添加player成功查询新增player数据
         sql = string.format(self.m_QueryByUidSql, uid)
         result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
