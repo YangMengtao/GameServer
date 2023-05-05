@@ -205,3 +205,5 @@ function PlayerSystem:updateToMysql()
         end
     end
 end
+
+return PlayerSystem
