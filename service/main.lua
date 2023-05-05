@@ -43,8 +43,10 @@ skynet.start(function ()
     -- end
 
     local login = skynet.newservice("login", mysql_db, redis_db)
+    local player = skynet.newservice("player", mysql_db, redis_db)
     for _, value in ipairs(M.m_Agent) do
         skynet.send(value, "lua", "ADD_SYSTEM", "login", login)
+        skynet.send(value, "lua", "ADD_SYSTEM", "player", player)
     end
 
     local balance = 1
