@@ -12,7 +12,7 @@ function system:initDB(mysql_db, redis_db)
 end
 
 function system:getUid(token)
-    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers")
     if online_users then
         online_users = cjson.decode(online_users)
         return online_users[token]
@@ -21,7 +21,7 @@ function system:getUid(token)
 end
 
 function system:getToken(uid)
-    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers")
     if online_users then
         online_users = cjson.decode(online_users)
         for token, v in pairs(online_users) do
@@ -34,7 +34,7 @@ function system:getToken(uid)
 end
 
 function system:setToOnline(uid, token)
-    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses") or {}
+    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers") or {}
     if online_users and online_users[token] == nil then
         if type(online_users) == "string" then
             online_users = cjson.decode(online_users)
@@ -42,7 +42,7 @@ function system:setToOnline(uid, token)
         online_users[token] = uid
         local value = cjson.encode(online_users)
         skynet.error(string.format("[Logic Error] : current online user info = %s", value))
-        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", value)
+        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUsers", value)
         skynet.call(self.m_RedisDB, "lua", "set", token, uid)
         return errcode.SUCCEESS
     else
@@ -59,13 +59,13 @@ function system:checkToken(data)
     end
 
     -- 更新在线玩家
-    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUses")
+    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers")
     if online_users then
         online_users = cjson.decode(online_users)
         online_users[data.token] = nil
         local value = cjson.encode(online_users)
         skynet.error(string.format("[Logic Error] : current online user info = %s", value))
-        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUses", value)
+        skynet.call(self.m_RedisDB, "lua", "set", "OnlineUsers", value)
     end
 
     return uid, errcode.INVALID_TOKEND
