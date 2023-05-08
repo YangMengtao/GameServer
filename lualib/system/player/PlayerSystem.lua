@@ -54,7 +54,10 @@ function PlayerSystem:createPlayer(uid, nickname)
 end
 
 function PlayerSystem:getPlayer(data)
-    local uid = self:getUid(data.token)
+    local uid, code = self:getUid(data.token)
+    if uid == nil then
+        return {errcode = code}
+    end
     local info = self:findPlayerInRedis(uid)
     if info then
         return info

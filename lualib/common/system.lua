@@ -12,12 +12,17 @@ function system:initDB(mysql_db, redis_db)
 end
 
 function system:getUid(token)
-    local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers")
-    if online_users then
-        online_users = cjson.decode(online_users)
-        return online_users[token]
+    local code = self:checkToken(token)
+
+    if code == errcode.SUCCEESS then
+        local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers")
+        if online_users then
+            online_users = cjson.decode(online_users)
+            return online_users[token]
+        end
     end
-    return nil
+    
+    return nil, code
 end
 
 function system:getToken(uid)
@@ -26,7 +31,10 @@ function system:getToken(uid)
         online_users = cjson.decode(online_users)
         for token, v in pairs(online_users) do
             if tonumber(v) == tonumber(uid) then
-                return token
+                if skynet.call(self.m_RedisDB, "lua", "get", token) ~= nil then
+                    return token
+                end
+                break
             end
         end
     end
@@ -55,7 +63,7 @@ function system:checkToken(data)
     local uid = skynet.call(self.m_RedisDB, "lua", "get", data.token)
     if uid then
         skynet.call(self.m_RedisDB, "lua", "expire", data.token, skynet.getenv("redis_token_expire"))
-        return uid, errcode.SUCCEESS
+        return errcode.SUCCEESS
     end
 
     -- 更新在线玩家
@@ -68,7 +76,7 @@ function system:checkToken(data)
         skynet.call(self.m_RedisDB, "lua", "set", "OnlineUsers", value)
     end
 
-    return uid, errcode.INVALID_TOKEND
+    return errcode.INVALID_TOKEND
 end
 
 return system
