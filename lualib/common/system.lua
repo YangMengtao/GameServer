@@ -42,6 +42,7 @@ function system:getToken(uid)
 end
 
 function system:setToOnline(uid, token)
+    skynet.error("[SYSTEM] set to online token = " .. token .. " uid =" .. uid)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers") or {}
     if online_users and online_users[token] == nil then
         if type(online_users) == "string" then
@@ -51,7 +52,8 @@ function system:setToOnline(uid, token)
         local value = cjson.encode(online_users)
         skynet.error(string.format("[Logic Error] : current online user info = %s", value))
         skynet.call(self.m_RedisDB, "lua", "set", "OnlineUsers", value)
-        skynet.call(self.m_RedisDB, "lua", "expire", token, uid)
+        skynet.call(self.m_RedisDB, "lua", "set", token, uid)
+        skynet.call(self.m_RedisDB, "lua", "expire", token, skynet.getenv("redis_token_expire"))
         return errcode.SUCCEESS
     else
         skynet.error(string.format("[Logic Error] : user uid = %s alredy exists, token is %s", uid, token))
@@ -59,10 +61,11 @@ function system:setToOnline(uid, token)
     end
 end
 
-function system:checkToken(data)
-    local uid = skynet.call(self.m_RedisDB, "lua", "get", data.token)
+function system:checkToken(token)
+    skynet.error("[SYSTEM] check token = " .. token)
+    local uid = skynet.call(self.m_RedisDB, "lua", "get", tostring(token))
     if uid then
-        skynet.call(self.m_RedisDB, "lua", "expire", data.token, skynet.getenv("redis_token_expire"))
+        skynet.call(self.m_RedisDB, "lua", "expire", token, skynet.getenv("redis_token_expire"))
         return errcode.SUCCEESS
     end
 
@@ -70,7 +73,7 @@ function system:checkToken(data)
     local online_users = skynet.call(self.m_RedisDB, "lua", "get", "OnlineUsers")
     if online_users then
         online_users = cjson.decode(online_users)
-        online_users[data.token] = nil
+        online_users[token] = nil
         local value = cjson.encode(online_users)
         skynet.error(string.format("[Logic Error] : current online user info = %s", value))
         skynet.call(self.m_RedisDB, "lua", "set", "OnlineUsers", value)
