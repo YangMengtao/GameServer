@@ -12,7 +12,7 @@ lua_path = "./etc/?.lua;" .. "./lualib/?.lua;" .. root .. "skynet/lualib/?.lua;"
 lua_cpath = "./luacpath/?.so;" .. root .. "skynet/luaclib/?.so;"
 
 agnet_count = 10
-port = 3636
+port = 5656
 
 -- web 服务协议
 protocol = "http"
@@ -22,7 +22,7 @@ mysql_host = "127.0.0.1"
 mysql_port = 3306
 mysql_database = "GameDB"
 mysql_user = "root"
-mysql_password = "123456"
+mysql_password = "!abc123"
 mysql_max_packet_size = 1024 * 1024
 
 -- Redis 配置
