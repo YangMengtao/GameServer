@@ -43,7 +43,7 @@ function system:setToOnline(uid, token)
         local value = cjson.encode(online_users)
         skynet.error(string.format("[Logic Error] : current online user info = %s", value))
         skynet.call(self.m_RedisDB, "lua", "set", "OnlineUsers", value)
-        skynet.call(self.m_RedisDB, "lua", "set", token, uid)
+        skynet.call(self.m_RedisDB, "lua", "expire", token, uid)
         return errcode.SUCCEESS
     else
         skynet.error(string.format("[Logic Error] : user uid = %s alredy exists, token is %s", uid, token))
