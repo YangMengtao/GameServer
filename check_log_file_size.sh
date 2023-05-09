@@ -14,7 +14,7 @@ while true; do
     if [ "${file_size}" -gt $((10 * 1024 * 1024)) ]; then
         # 如果文件超过10M，复制一份新的文件并以时间命名
         timestamp=$(date +%Y%m%d%H%M%S)
-        cp "${file_path}" "${file_path}_${timestamp}"
+        cp "${file_path}" "${timestamp}.log"
         
         # 清空原文件内容
         echo "" > "${file_path}"

@@ -10,6 +10,7 @@ kill -9 $pid
 
 # 备份被删除原有的log文件
 file_path="logs/skynet.log"
+file_ext = ".log"
 timestamp=$(date +%Y%m%d%H%M%S)
-cp "${file_path}" "${file_path}_${timestamp}"
+cp "${file_path}" "${timestamp}.log"
 rm -rf ${file_path}
