@@ -40,7 +40,7 @@ function LoginSystem:login(data)
             local password = result[1].password
             if password == md5.sumhexa(tostring(data.password)) then
                 local token = self:getToken(uid)
-                if token then
+                if token ~= nil and token ~= "" then
                     ret.errcode = errcode.ERR_REPEAT_LOGIN
                     ret.token = token
                     return ret
