@@ -29,6 +29,7 @@ GIT
 case "${1,,}" in
   w)
     ./skynet/skynet etc/web_config -D
+    ./redis_empty.sh
     ./check_log_file_size.sh
     ;;
   *)
