@@ -32,3 +32,5 @@ redis_db = 0
 redis_token_expire = 30 * 60
 
 daemon = "./skynet.pid"
+logservice = "logger"           -- 使用logger作为日志服务
+logger = "./logs/skynet.log"    -- 输出日志到指定文件
