@@ -83,7 +83,7 @@ function PlayerSystem:getPlayerByUid(uid)
     -- 查询player数据
     local sql = string.format(self.m_QueryByUidSql, uid)
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
-    if result then
+    if result and #result > 0 then
         local ret = {}
         ret.id = result[1].id
         ret.uid = result[1].uid
