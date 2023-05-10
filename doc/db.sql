@@ -1,4 +1,6 @@
-CREATE DATABASE GameDB;
+DROP DATABASE GameDB
+
+CREATE DATABASE IF NOT EXISTS GameDB;
 --DROP DATABASE GameDB;
 
 --DROP TABLE `user`;
@@ -9,7 +11,7 @@ CREATE DATABASE GameDB;
 -- usename 账号名字
 -- password 账号密码
 -- permission 权限
-CREATE TABLE `user` (
+CREATE TABLE IF NOT EXISTS `user` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(128) NOT NULL,
   `password` varchar(128) NOT NULL,
@@ -22,8 +24,7 @@ CREATE TABLE `user` (
 --SELECT uid, username, password, permission FROM user;
 -- DELETE FROM user WHERE gold = 0;
 
-
-CREATE TABLE `player` (
+CREATE TABLE IF NOT EXISTS `player` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `uid` INT(11) NOT NULL,
   `nickname` VARCHAR(128) NOT NULL,
@@ -34,7 +35,7 @@ CREATE TABLE `player` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
 
-CREATE TABLE `team_member` (
+CREATE TABLE IF NOT EXISTS `team_member` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
   `pid` INT(11),
   `alive` INT(2) NOT NULL DEFAULT 1,
