@@ -1,12 +1,4 @@
 
---DROP TABLE `user`;
---DESCRIBE `user`; 
---SHOW COLUMNS FROM `user`;
-
--- uid 账号唯一id
--- usename 账号名字
--- password 账号密码
--- permission 权限
 CREATE TABLE IF NOT EXISTS `user` (
   `uid` int(11) NOT NULL AUTO_INCREMENT,
   `username` varchar(128) NOT NULL,
@@ -15,10 +7,6 @@ CREATE TABLE IF NOT EXISTS `user` (
   `create_time` int(10) NOT NULL DEFAULT 0,
   PRIMARY KEY (`uid`)
 ) ENGINE=InnoDB AUTO_INCREMENT=1 DEFAULT CHARSET=utf8mb4;
-
---INSERT INTO `user` (`username`, `password`) VALUES ("aaaa", "123456");
---SELECT uid, username, password, permission FROM user;
--- DELETE FROM user WHERE gold = 0;
 
 CREATE TABLE IF NOT EXISTS `player` (
   `id` INT(11) NOT NULL AUTO_INCREMENT,
