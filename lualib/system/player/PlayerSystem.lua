@@ -11,13 +11,14 @@ function PlayerSystem:ctor()
 end
 
 function PlayerSystem:initSql()
-    self.m_QueryByUidSql = "SELECT id,uid,nickname,money,curlevel,item FROM player WHERE uid='%d'"
-    self.m_NewPlayerSql = "INSERT INTO player (uid,nickname) VALUES ('%d', '%s')"
+    self.m_QueryByUidSql = "SELECT id,uid,nickname,money,curlevel,item,lastOnline FROM player WHERE uid='%d'"
+    self.m_NewPlayerSql = "INSERT INTO player (uid,nickname,lastOnline) VALUES ('%d', '%s', '%d')"
     self.m_UpatePlayerSql = "UPDATE player SET nickname = %s,SET money = %d,SET curlevel = %d,SET item = %s WHERE uid = '%d'"
     self.m_UpdatePlayerMonery = "UPDATE player SET money = %d WHERE uid = '%d'"
     self.m_UpdatePlayerLevel = "UPDATE player SET curlevel = %d WHERE uid = '%d'"
     self.m_UpdatePlayerNickName = "UPDATE player SET nickname = %s WHERE uid = '%d'"
     self.m_UpdatePlayerItem = "UPDATE player SET item = %s WHERE uid = '%d'"
+    self.m_UpdatePlayerOnlineTime = "UPDATE player SET lastOnline = %d WHERE uid = '%d'"
 
     self.m_NewMemberSql = "INSERT INTO team_member (pid,hp,energy) VALUES ('%d', '%d', '%d')"
     self.m_QueryTeamMember = "SELECT id,alive,weaponid,armorid,normalskillid,ultraskillid,hp,energy,practiceattrs,rewardattrs FROM team_member WHERE pid = '%d'"
@@ -26,7 +27,7 @@ end
 
 function PlayerSystem:createPlayer(uid, nickname)
     -- 添加Player
-    local sql = string.format(self.m_NewPlayerSql, uid, nickname)
+    local sql = string.format(self.m_NewPlayerSql, uid, nickname, os.time())
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
     if result then
         -- 添加player成功查询新增player数据
@@ -70,6 +71,7 @@ function PlayerSystem:getPlayerByUid(uid)
         ret.money = result[1].money
         ret.curlevel = result[1].curlevel
         ret.item = result[1].item
+        ret.lastOnlineTime = os.time()
         ret.token = self:getToken(ret.uid)
         ret.team = self:queryMember(ret.id)
         return ret;
@@ -175,6 +177,12 @@ function PlayerSystem:getPlayer(data)
             p.errcode = errcode.ERR_NO_MEMBER
             return p
         else
+            local sql = string.format(self.m_UpdatePlayerOnlineTime, p.lastOnlineTime, uid)
+            local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+            if not result then
+                skynet.error("[PLAYER ERROR] player info update last online time faild, uid = " .. uid)
+                return { errcode.HANDLE_SQL_FAILED }
+            end
             self:setPlayerInRedis(p)
             return self:findPlayerInRedis(uid)
         end

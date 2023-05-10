@@ -13,7 +13,7 @@ end
 
 function LoginSystem:initSql()
     self.m_QueryPasswordSql = "SELECT uid,password FROM user WHERE username='%s'"
-    self.m_NewUserSql = "INSERT INTO user (username, password) VALUES ('%s', '%s')"
+    self.m_NewUserSql = "INSERT INTO user (username, password,create_time) VALUES ('%s', '%s', '%d')"
 end
 
 function LoginSystem:genToken(uid)
@@ -71,7 +71,7 @@ function LoginSystem:register(data)
             ret.errcode = errcode.ERR_ALREADY_HAS_ACCOUNT
             return ret
         else
-            result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, md5.sumhexa(data.password)))
+            result = skynet.call(self.m_MysqlDB, "lua", "excute", string.format(self.m_NewUserSql, data.username, md5.sumhexa(data.password), os.time()))
             if result then
                 local sql = string.format(self.m_QueryPasswordSql, data.username)
                 local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
