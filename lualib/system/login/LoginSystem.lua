@@ -25,11 +25,7 @@ function LoginSystem:genToken(uid)
     return token
 end
 
---[[
-    data.token
-    data.username
-    data.password
-]]
+-- FOR CLIENT API
 function LoginSystem:login(data)
     local sql = string.format(self.m_QueryPasswordSql, data.username)
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)

@@ -14,6 +14,11 @@ function PlayerSystem:initSql()
     self.m_QueryByUidSql = "SELECT id,uid,nickname,money,curlevel,item FROM player WHERE uid='%d'"
     self.m_NewPlayerSql = "INSERT INTO player (uid,nickname) VALUES ('%d', '%s')"
     self.m_UpatePlayerSql = "UPDATE player SET nickname = %s,SET money = %d,SET curlevel = %d,SET item = %s WHERE uid = '%d'"
+    self.m_UpdatePlayerMonery = "UPDATE player SET money = %d WHERE uid = '%d'"
+    self.m_UpdatePlayerLevel = "UPDATE player SET curlevel = %d WHERE uid = '%d'"
+    self.m_UpdatePlayerNickName = "UPDATE player SET nickname = %s WHERE uid = '%d'"
+    self.m_UpdatePlayerItem = "UPDATE player SET item = %s WHERE uid = '%d'"
+
     self.m_NewMemberSql = "INSERT INTO team_member (pid,hp,energy) VALUES ('%d', '%d', '%d')"
     self.m_QueryTeamMember = "SELECT id,alive,weaponid,armorid,normalskillid,ultraskillid,hp,energy,practiceattrs,rewardattrs FROM team_member WHERE pid = '%d'"
     self.m_UpdateMemberInfo = "UPDATE team_member SET alive = '%d',SET weaponid = '%d',SET armorid = '%d',SET normalskillid = '%d',SET ultraskillid = '%d',SET hp = '%d',SET energy = '%d' WHERE id = '%d'"
@@ -51,32 +56,6 @@ function PlayerSystem:createPlayer(uid, nickname)
         end
     end
     return errcode.ERR_ADD_NEW_PLAYER_FAILED
-end
-
-function PlayerSystem:getPlayer(data)
-    local uid, code = self:getUid(data.token)
-    if uid == nil then
-        return {errcode = code}
-    end
-    local info = self:findPlayerInRedis(uid)
-    if info then
-        return info
-    end
-    local p = self:getPlayerByUid(uid)
-    if p ~= nil then
-        if p.team == nil then
-            p.errcode = errcode.ERR_NO_MEMBER
-            return p
-        else
-            self:setPlayerInRedis(p)
-            return self:findPlayerInRedis(uid)
-        end
-    end
-    local ret = self:createPlayer(uid, data.nickname)
-    if errcode.SUCCEESS ~= ret then
-        return ret
-    end
-    return self:findPlayerInRedis(uid)
 end
 
 function PlayerSystem:getPlayerByUid(uid)
@@ -132,59 +111,6 @@ function PlayerSystem:queryMember(pid)
     return nil
 end
 
-function PlayerSystem:updateMoney(pid, value)
-   local info = self:findPlayerInRedis(pid)
-   if info then
-        info.money = info.money + value
-        self:setPlayerInRedis(info)
-        return errcode.SUCCEESS
-   end
-   return errcode.ERR_UPDATE_MONEY_FAILED
-end
-
-function PlayerSystem:updateLevel(pid, value)
-    local info = self:findPlayerInRedis(pid)
-    if info then
-         info.curlevel = value
-         self:setPlayerInRedis(info)
-         return errcode.SUCCEESS
-    end
-    return errcode.ERR_UPDATE_LEVEL_FAILED
- end
-
- function PlayerSystem:updateItem(pid, itemid, value)
-    local info = self:findPlayerInRedis(pid)
-    if info then
-        local itemInfo = cjson.decode(info.item)
-         local count = itemInfo[itemid]
-         if count == nil then
-            itemInfo[itemid] = value
-         else
-            itemInfo[itemid] = count + value
-         end
-         info.item = cjson.encode(itemInfo)
-         self:setPlayerInRedis(info)
-         return errcode.SUCCEESS
-    end
-    return errcode.ERR_UPDATE_ITEM_FAILED
- end
-
- function PlayerSystem:updateMember(pid, memberInfo)
-    local info = self:findPlayerInRedis(pid)
-    if info then
-        for i = #info.team, 1, -1 do
-            if info.team[i] == memberInfo.id then
-                table.remove(info.team, i)
-                break
-            end
-        end
-        table.insert( info.team, memberInfo )
-        self:setPlayerInRedis(info)
-        return errcode.SUCCEESS
-    end
-    return errcode.ERR_UPDATE_MEMBER_INFO_FAILED
- end
-
 function PlayerSystem:findPlayerInRedis(uid)
     local players = skynet.call(self.m_RedisDB, "lua", "get", "PlayerInfo") or {}
     if type(players) == "string" then
@@ -230,6 +156,130 @@ function PlayerSystem:updateToMysql()
             end
         end
     end
+end
+
+
+-- FOR CLINET API
+function PlayerSystem:getPlayer(data)
+    local uid, code = self:getUid(data.token)
+    if uid == nil then
+        return {errcode = code}
+    end
+    local info = self:findPlayerInRedis(uid)
+    if info then
+        return info
+    end
+    local p = self:getPlayerByUid(uid)
+    if p ~= nil then
+        if p.team == nil then
+            p.errcode = errcode.ERR_NO_MEMBER
+            return p
+        else
+            self:setPlayerInRedis(p)
+            return self:findPlayerInRedis(uid)
+        end
+    end
+    local ret = self:createPlayer(uid, data.nickname)
+    if errcode.SUCCEESS ~= ret then
+        return ret
+    end
+    return self:findPlayerInRedis(uid)
+end
+
+function PlayerSystem:updateMoney(data)
+    local uid, code = self:getUid(data.token)
+    if uid == nil then
+        return {errcode = code}
+    end
+    local info = self:findPlayerInRedis(uid)
+    if info then
+        info.money = info.money + data.value
+        local sql = string.format(self.m_UpdatePlayerMonery, info.money, uid)
+        local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+        if not result then
+            skynet.error("[PLAYER ERROR] player info update money faild, uid = " .. uid)
+            return { errcode.HANDLE_SQL_FAILED }
+        end
+        self:setPlayerInRedis(info)
+        return { errcode.SUCCEESS, money = info.money }
+    end
+    return { errcode.ERR_UPDATE_MONEY_FAILED }
+end
+ 
+function PlayerSystem:updateLevel(data)
+    local uid, code = self:getUid(data.token)
+    if uid == nil then
+        return {errcode = code}
+    end
+    local info = self:findPlayerInRedis(uid)
+    if info then
+        info.curlevel = data.value
+        local sql = string.format(self.m_UpdatePlayerLevel, info.curlevel, uid)
+        local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+        if not result then
+            skynet.error("[PLAYER ERROR] player info update level faild, uid = " .. uid)
+            return { errcode.HANDLE_SQL_FAILED }
+        end
+        self:setPlayerInRedis(info)
+        return { errcode.SUCCEESS, info.curlevel }
+    end
+    return { errcode.ERR_UPDATE_LEVEL_FAILED }
+end
+ 
+function PlayerSystem:updateItem(data)
+    local uid, code = self:getUid(data.token)
+    if uid == nil then
+        return {errcode = code}
+    end
+    local info = self:findPlayerInRedis(uid)
+    if info then
+        local itemInfo = cjson.decode(info.item)
+        local count = itemInfo[data.itemid]
+        if count == nil then
+            itemInfo[data.itemid] = data.value
+        else
+            itemInfo[data.itemid] = count + data.value
+        end
+        info.item = cjson.encode(itemInfo)
+        local sql = string.format(self.m_UpdatePlayerItem, info.item, uid)
+        local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+        if not result then
+            skynet.error("[PLAYER ERROR] player info update item faild, uid = " .. uid)
+            return { errcode.HANDLE_SQL_FAILED }
+        end
+        self:setPlayerInRedis(info)
+        return { errcode.SUCCEESS, item = info.item }
+    end
+    return { errcode.ERR_UPDATE_ITEM_FAILED }
+end
+
+function PlayerSystem:updateMember(data)
+    local uid, code = self:getUid(data.token)
+    if uid == nil then
+        return {errcode = code}
+    end
+    local info = self:findPlayerInRedis(uid)
+    if info then
+        local member = cjson.decode(data.memberInfo)
+        local team = cjson.decode(info.team)
+        for i = #team, 1, -1 do
+            if team[i] == member.id then
+                table.remove(team, i)
+                break
+            end
+        end
+        table.insert( team, member )
+        info.team = cjson.encode(team)
+        local sql = string.format(self.m_UpdateMemberInfo, info.team, uid)
+        local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
+        if not result then
+            skynet.error("[PLAYER ERROR] player info update member data faild, uid = " .. uid)
+            return { errcode.HANDLE_SQL_FAILED }
+        end
+        self:setPlayerInRedis(info)
+        return { errcode.SUCCEESS, team = info.team }
+    end
+    return { errcode.ERR_UPDATE_MEMBER_INFO_FAILED }
 end
 
 return PlayerSystem
