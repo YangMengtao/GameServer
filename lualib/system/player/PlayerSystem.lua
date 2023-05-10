@@ -27,7 +27,8 @@ end
 
 function PlayerSystem:createPlayer(uid, nickname)
     -- 添加Player
-    local sql = string.format(self.m_NewPlayerSql, uid, nickname, os.time())
+    local time = os.time()
+    local sql = string.format(self.m_NewPlayerSql, uid, nickname, time)
     local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
     if result then
         -- 添加player成功查询新增player数据
@@ -41,6 +42,8 @@ function PlayerSystem:createPlayer(uid, nickname)
             ret.money = result[1].money
             ret.curlevel = result[1].curlevel
             ret.item = result[1].item
+            ret.lasttime = time
+
             ret.token = self:getToken(ret.uid)
 
             -- 添加一个team member
@@ -71,7 +74,7 @@ function PlayerSystem:getPlayerByUid(uid)
         ret.money = result[1].money
         ret.curlevel = result[1].curlevel
         ret.item = result[1].item
-        ret.lastOnlineTime = os.time()
+        ret.lasttime = os.time()
         ret.token = self:getToken(ret.uid)
         ret.team = self:queryMember(ret.id)
         return ret;
@@ -177,7 +180,7 @@ function PlayerSystem:getPlayer(data)
             p.errcode = errcode.ERR_NO_MEMBER
             return p
         else
-            local sql = string.format(self.m_UpdatePlayerOnlineTime, p.lastOnlineTime, uid)
+            local sql = string.format(self.m_UpdatePlayerOnlineTime, p.lasttime, uid)
             local result = skynet.call(self.m_MysqlDB, "lua", "excute", sql)
             if not result then
                 skynet.error("[PLAYER ERROR] player info update last online time faild, uid = " .. uid)
