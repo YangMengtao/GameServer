@@ -43,17 +43,19 @@ function PlayerSystem:createPlayer(uid, nickname)
             ret.curlevel = result[1].curlevel
             ret.item = result[1].item
             ret.lasttime = time
-
+            ret.errcode = errcode.SUCCEESS
             ret.token = self:getToken(ret.uid)
 
             -- 添加一个team member
             if self:addNewMember(ret.id, 100, 0) then
                 ret.team = self:queryMember(ret.id)
                 if ret.team == nil then
+                    ret.errcode = errcode.ERR_NO_MEMBER
                     return errcode.ERR_NO_MEMBER
                 end
                 self:setPlayerInRedis(ret)
             else
+                ret.errcode = errcode.ERR_ADD_NEW_MEMBER_FAILED
                 return errcode.ERR_ADD_NEW_MEMBER_FAILED
             end
             return errcode.SUCCEESS
@@ -77,6 +79,7 @@ function PlayerSystem:getPlayerByUid(uid)
         ret.lasttime = os.time()
         ret.token = self:getToken(ret.uid)
         ret.team = self:queryMember(ret.id)
+        ret.errcode = errcode.SUCCEESS
         return ret;
     end
 
